@@ -1,10 +1,9 @@
-version: '2'
+version: "2"
 
 networks:
   default:
 
 services:
-
   financedb:
     image: mariadb
     restart: always
@@ -17,7 +16,7 @@ services:
     networks:
       - default
     healthcheck:
-      test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       timeout: 2s
       retries: 10
 
@@ -32,7 +31,7 @@ services:
     expose:
       - "8081"
     depends_on:
-        financedb:
-          condition: service_healthy
+      financedb:
+        condition: service_healthy
     networks:
       - default

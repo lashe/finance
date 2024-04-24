@@ -31,7 +31,8 @@ public class InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final MessageSource messageSource;
 
-    public InvoiceService(AccountRepository accountRepository, InvoiceModelAssembler assembler, InvoiceRepository invoiceRepository, MessageSource messageSource) {
+    public InvoiceService(AccountRepository accountRepository, InvoiceModelAssembler assembler,
+            InvoiceRepository invoiceRepository, MessageSource messageSource) {
         this.accountRepository = accountRepository;
         this.assembler = assembler;
         this.invoiceRepository = invoiceRepository;
@@ -50,6 +51,17 @@ public class InvoiceService {
                 .map(assembler::toModel)
                 .collect(Collectors.toList());
         return CollectionModel.of(invoices, linkTo(methodOn(InvoiceController.class).all()).withSelfRel());
+    }
+
+    public CollectionModel<EntityModel<Invoice>> getAllInvoicesForStudent(String studentId) {
+        Account studentAccount = accountRepository.findAccountByStudentId(studentId);
+        List<EntityModel<Invoice>> invoices = invoiceRepository
+                .findInvoiceByAccount_IdAndStatus(studentAccount.getId(), Status.OUTSTANDING)
+                .stream()
+                .map(assembler::toModel)
+                .collect(Collectors.toList());
+        return CollectionModel.of(invoices,
+                linkTo(methodOn(InvoiceController.class).all()).withSelfRel());
     }
 
     public ResponseEntity<?> createNewInvoice(Invoice invoice) {
@@ -128,7 +140,8 @@ public class InvoiceService {
             invoice.setStatus(Status.PAID);
             return invoiceRepository.save(invoice);
         } else {
-            throw new UnsupportedOperationException("You can't pay an invoice that is in the " + invoice.getStatus() + " status");
+            throw new UnsupportedOperationException(
+                    "You can't pay an invoice that is in the " + invoice.getStatus() + " status");
         }
     }
 

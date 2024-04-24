@@ -8,8 +8,7 @@ import uk.ac.leedsbeckett.finance.model.Invoice;
 import uk.ac.leedsbeckett.finance.service.InvoiceService;
 
 @RestController
-public
-class InvoiceController {
+public class InvoiceController {
 
     private final InvoiceService invoiceService;
 
@@ -25,6 +24,11 @@ class InvoiceController {
     @GetMapping("/invoices/{id}")
     public EntityModel<Invoice> one(@PathVariable Long id) {
         return invoiceService.getInvoiceById(id);
+    }
+
+    @GetMapping("/invoice/{studentId}")
+    public CollectionModel<EntityModel<Invoice>> getAllStudentInvoices(@PathVariable String studentId) {
+        return invoiceService.getAllInvoicesForStudent(studentId);
     }
 
     @GetMapping("/invoices/reference/{reference}")
